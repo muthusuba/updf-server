@@ -2,7 +2,7 @@
 # Python script for converting documents to pdf
 # using libreoffice/openoffice.org
 #
-# Copyright (C) Muthu Subramanian K <muthusuba@gmail.com> 2011
+# Copyright (C) Muthu Subramanian K <muthusuba@gmail.com> 2011-2016
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -43,6 +43,7 @@ STATUS_FAILED       = 4
 dbpath = "/tmp/updf.sql" #sys.argv[0][:sys.argv[0].rfind("/")]+"/updf.sql"
 libo="./soffice.bin "
 dirprefix = "/tmp/updf/"
+ebook = "ebook-convert --enable-heuristics "
 sqlconn = sqlite3.connect(dbpath)
 sqlcur = sqlconn.cursor()
 sleeplong = True
@@ -70,8 +71,11 @@ def setComplete(id, status):
     sqlcur.execute('update updf set status=? where id=?',(str(status), id))
 
 def convertNext(row):
-    file = dirprefix+str(row[1])+"."+str(row[2])
+    ext = str(row[2])
+    file = dirprefix+str(row[1])+"."+ext
     command = libo+"-convert-to pdf -outdir "+dirprefix+" "+file
+    if ext == "epub" or ext == "mobi":
+        command = ebook + file + " " + str(row[1]) + ".pdf"
     ret = os.system(command)
     try:
         os.chmod(file, stat.S_IWRITE|stat.S_IXGRP|stat.S_IRWXO)
