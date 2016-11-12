@@ -43,7 +43,7 @@ STATUS_FAILED       = 4
 dbpath = "/tmp/updf.sql" #sys.argv[0][:sys.argv[0].rfind("/")]+"/updf.sql"
 libo="./soffice.bin "
 dirprefix = "/tmp/updf/"
-ebook = "ebook-convert --enable-heuristics "
+ebook = "ebook-convert "
 sqlconn = sqlite3.connect(dbpath)
 sqlcur = sqlconn.cursor()
 sleeplong = True
@@ -75,7 +75,7 @@ def convertNext(row):
     file = dirprefix+str(row[1])+"."+ext
     command = libo+"-convert-to pdf -outdir "+dirprefix+" "+file
     if ext == "epub" or ext == "mobi":
-        command = ebook + file + " " + str(row[1]) + ".pdf"
+        command = ebook + file + " " + dirprefix + str(row[1]) + ".pdf --enable-heuristics"
     ret = os.system(command)
     try:
         os.chmod(file, stat.S_IWRITE|stat.S_IXGRP|stat.S_IRWXO)
